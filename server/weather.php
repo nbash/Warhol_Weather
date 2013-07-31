@@ -11,13 +11,13 @@ function get_data($url) {
     return $data;
 }
 
-define('API_KEY', 'API_KEY_GOES_HERE'); 
+define('API_KEY', 'YOUR_API_KEY_HERE'); 
 $payload = json_decode(file_get_contents('php://input'), true);
 if(!$payload) die();
 $payload[1] /= 10000;
 $payload[2] /= 10000;
 
-$contents = get_data("https://api.forecast.io/forecast/API_KEY_GOES_HERE/$payload[1],$payload[2]?units=$payload[3]&exclude=hourly,minutely,alerts");
+$contents = get_data("https://api.forecast.io/forecast/YOUR_API_KEY_HERE/$payload[1],$payload[2]?units=$payload[3]&exclude=hourly,minutely,alerts");
 
 $forecast = json_decode($contents);
  
@@ -40,12 +40,27 @@ $icons = array(
 $sunset = $forecast->daily->data[0]->sunsetTime;
 $sunset_h = date('H', $sunset);
 $sunset_m = date('i', $sunset);
+
+$round_m = intval($sunset_m);
+
+while ($round_m < 10)
+{
+  if ($round_m < 5)
+  {
+    $round_m = 59;
+  }
+  elseif ($round_m >=5)
+  {
+    $round_m = 10;
+    }
+}
+
 $icon_id = $icons[$forecast->currently->icon];
 $response[1] = array('b', $icon_id);
 $response[2] = array('s', round($forecast->currently->temperature));
 $response[3] = array('s', round($forecast->daily->data[0]->temperatureMax));
 $response[4] = array('s', round($forecast->daily->data[0]->temperatureMin));
 $response[5] = array('s', intval($sunset_h));
-$response[6] = array('s', intval($sunset_m));
+$response[6] = array('s', intval($round_m));
 header("Cache-Control: max-age=540");
 print json_encode($response);

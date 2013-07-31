@@ -1,7 +1,6 @@
 #include "pebble_os.h"
 #include "pebble_app.h"
 #include "pebble_fonts.h"
-
 #include "http.h"
 #include "util.h"
 #include "weather_layer.h"
@@ -9,16 +8,15 @@
 #include "link_monitor.h"
 #include "config.h"
 
+	
 #define MY_UUID { 0x91, 0x41, 0xB6, 0x28, 0xBC, 0x89, 0x49, 0x8E, 0xB1, 0x47, 0x04, 0x9F, 0x49, 0xC0, 0x99, 0xAD }
 
 PBL_APP_INFO(MY_UUID,
              "Warhol Weather", "NBASH", // Modification of "Roboto Weather" by Martin Rosinski
-             1, 71, /* App version */
+             1, 05, /* App version */
              RESOURCE_ID_IMAGE_MENU_ICON,
              APP_INFO_WATCH_FACE);
-//LEFT TOP WIDE HIGH
-#define TIME_FRAME      (GRect(0, 52, 144, 55))
-#define DATE_FRAME      (GRect(0, 108, 144, 20))
+
 
 // POST variables
 #define WEATHER_KEY_LATITUDE 1
@@ -33,8 +31,16 @@ PBL_APP_INFO(MY_UUID,
 #define WEATHER_KEY_SH 5	
 #define WEATHER_KEY_SM 6
 	
+
+
 #define WEATHER_HTTP_COOKIE 1949327671
 #define TIME_HTTP_COOKIE 1131038282
+/*
+GRect works like this - LEFT TOP WIDE HIGH
+*/
+#define TIME_FRAME      (GRect(0, 52, 144, 55))
+#define DATE_FRAME      (GRect(0, 108, 144, 20))
+
 
 Window window;          /* main window */
 TextLayer date_layer;   /* layer for the date */
@@ -53,10 +59,12 @@ WeatherLayer weather_layer;
 
 void request_weather();
 
+/*FAILED REQUEST OF WEATHER EITHER NO CONNECTION OR HTTP ERROR
+***************************************************************/
 void failed(int32_t cookie, int http_status, void* context) {
-	if(cookie == 0 || cookie == WEATHER_HTTP_COOKIE) {
-		weather_layer_set_icon(&weather_layer, WEATHER_ICON_NO_WEATHER);
-		located = false;
+	if(cookie == 0 || cookie == WEATHER_HTTP_COOKIE) {		
+//		weather_layer_set_icon(&weather_layer, WEATHER_ICON_NO_WEATHER);
+//		text_layer_set_text(&weather_layer.temp_layer, "---°   ");
 	}
 	
 	link_monitor_handle_failure(http_status);
@@ -65,34 +73,54 @@ void failed(int32_t cookie, int http_status, void* context) {
 	located = false;
 }
 
+/*IF SUCCESSFUL CONNECTION THEN DO THE FOLLOWING
+***************************************************/
 void success(int32_t cookie, int http_status, DictionaryIterator* received, void* context) {
 	if(cookie != WEATHER_HTTP_COOKIE) return;
+/*
+GET THE WEATHER ICON
+***************************/
 	Tuple* icon_tuple = dict_find(received, WEATHER_KEY_ICON);
 	if(icon_tuple) {
 		int icon = icon_tuple->value->int8;
 		if(icon >= 0 && icon < 10) {
 			weather_layer_set_icon(&weather_layer, icon);
 		} else {
-			weather_layer_set_icon(&weather_layer, WEATHER_ICON_NO_WEATHER);
+			//weather_layer_set_icon(&weather_layer, WEATHER_ICON_NO_WEATHER);
+			text_layer_set_text(&weather_layer.temp_layer, "???");
 		}
 	}
+/*
+GET THE TEMPERATURE
+***************************/	
 	Tuple* temperature_tuple = dict_find(received, WEATHER_KEY_TEMPERATURE);
 	if(temperature_tuple) {
 		weather_layer_set_temperature(&weather_layer, temperature_tuple->value->int16);
 	}
+/*
+GET THE HIGH TEMP
+***************************/
 	Tuple* high_tuple = dict_find(received, WEATHER_KEY_HIGH);
 	if(high_tuple) {
 		weather_layer_set_high(&weather_layer, high_tuple->value->int16);
 	}
+/*
+GET THE LOW TEMP
+***************************/	
 	Tuple* low_tuple = dict_find(received, WEATHER_KEY_LOW);
 	if(low_tuple) {
 		weather_layer_set_low(&weather_layer, low_tuple->value->int16);
 	}
-	
+/*
+GET THE SUNSET HOUR
+***************************/
 	Tuple* sh_tuple = dict_find(received, WEATHER_KEY_SH);
 	if(sh_tuple) {
 		weather_layer_set_sh(&weather_layer, sh_tuple->value->int16);
 	}
+/*
+GET THE SUNSET MINUTE
+***************************/
 	Tuple* sm_tuple = dict_find(received, WEATHER_KEY_SM);
 	if(sm_tuple) {
 		weather_layer_set_sm(&weather_layer, sm_tuple->value->int16);
@@ -102,6 +130,10 @@ void success(int32_t cookie, int http_status, DictionaryIterator* received, void
 	link_monitor_handle_success();
 }
 
+
+
+/*GET OUR LOCATION AND * BY 10000 TO GET RID OF THE DECIMAL
+*************************************************************************/
 void location(float latitude, float longitude, float altitude, float accuracy, void* context) {
 	// Fix the floats
 	our_latitude = latitude * 10000;
@@ -109,7 +141,8 @@ void location(float latitude, float longitude, float altitude, float accuracy, v
 	located = true;
 	request_weather();
 }
-
+/*RECONNECT IF CONNECTION LOST
+************************************/
 void reconnect(void* context) {
 	located = false;
 	request_weather();
@@ -151,12 +184,12 @@ void handle_minute_tick(AppContextRef ctx, PebbleTickEvent *t)
     if (clock_is_24h_style())
     {
         string_format_time(hour_text, sizeof(hour_text), "%H", t->tick_time);
-		if (hour_text[0] == '0')
-        {
-            /* This is a hack to get rid of the leading zero of the hour.
-            */
-            memmove(&hour_text[0], &hour_text[1], sizeof(hour_text) - 1);
-        }
+//		if (hour_text[0] == '0')
+//        {
+//            /* This is a hack to get rid of the leading zero of the hour.
+//            */
+//            memmove(&hour_text[0], &hour_text[1], sizeof(hour_text) - 1);
+//        }
     }
     else
     {
@@ -282,9 +315,9 @@ void request_weather() {
 	}
 	// Build the HTTP request
 	DictionaryIterator *body;
-	HTTPResult result = http_out_get("http://futtle.com/pebble/dookie_weather.php", WEATHER_HTTP_COOKIE, &body);
+	HTTPResult result = http_out_get("http://EXAMPLE.com/YOUR_WEATHER.php", WEATHER_HTTP_COOKIE, &body);
 	if(result != HTTP_OK) {
-		weather_layer_set_icon(&weather_layer, WEATHER_ICON_NO_WEATHER);
+		weather_layer_set_icon(&weather_layer, WEATHER_ICON_HTTP_ERROR);
 		return;
 	}
 	dict_write_int32(body, WEATHER_KEY_LATITUDE, our_latitude);
@@ -292,7 +325,7 @@ void request_weather() {
 	dict_write_cstring(body, WEATHER_KEY_UNIT_SYSTEM, UNIT_SYSTEM);
 	// Send it.
 	if(http_out_send() != HTTP_OK) {
-		weather_layer_set_icon(&weather_layer, WEATHER_ICON_NO_WEATHER);
+		weather_layer_set_icon(&weather_layer, WEATHER_ICON_HTTP_ERROR);
 		return;
 	}
 }

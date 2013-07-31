@@ -1,6 +1,11 @@
 {
     "media": [
         {
+            "defName": "ICON_HTTP_ERROR",
+            "type": "png",
+            "file": "images/HTTP_ERROR.png"
+        },
+        {
             "defName": "ICON_CLEAR_DAY",
             "type": "png",
             "file": "images/clear-day.png"
@@ -11,21 +16,8 @@
             "file": "images/background.png"
         },
         {
-            "characterRegex": "[0-9 a-z A-Z]",
-            "defName": "DATE_19",
-            "type": "font",
-            "file": "fonts/Trebuchet MS.ttf"
-        },
-        {
-            "trackingAdjust": -4,
-            "characterRegex": "[0-9 \u00b0 ?]",
-            "defName": "TEMP_42",
-            "type": "font",
-            "file": "fonts/Trebuchet MS.ttf"
-        },
-        {
-            "characterRegex": "[0-9 \u00b0 ?]",
-            "defName": "HIGH_LOW_16",
+            "characterRegex": "[0-9 : Sunset]",
+            "defName": "SUNSET_18",
             "type": "font",
             "file": "fonts/Trebuchet MS.ttf"
         },
@@ -36,8 +28,22 @@
             "file": "fonts/Trebuchet MS.ttf"
         },
         {
-            "characterRegex": "[0-9 : Sunset]",
-            "defName": "SUNSET_18",
+            "trackingAdjust": -1,
+            "characterRegex": "[0-9 \u00b0 ?]",
+            "defName": "HIGH_LOW_17",
+            "type": "font",
+            "file": "fonts/Trebuchet MS.ttf"
+        },
+        {
+            "trackingAdjust": -1,
+            "characterRegex": "[0-9 \u00b0 ?]",
+            "defName": "TEMP_42",
+            "type": "font",
+            "file": "fonts/Trebuchet MS.ttf"
+        },
+        {
+            "characterRegex": "[0-9 a-z A-Z]",
+            "defName": "DATE_19",
             "type": "font",
             "file": "fonts/Trebuchet MS.ttf"
         },
