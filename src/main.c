@@ -31,25 +31,23 @@ PBL_APP_INFO(MY_UUID,
 #define WEATHER_KEY_SH 5	
 #define WEATHER_KEY_SM 6
 	
-
-
+//Cookie variables
 #define WEATHER_HTTP_COOKIE 1949327671
 #define TIME_HTTP_COOKIE 1131038282
-/*
-GRect works like this - LEFT TOP WIDE HIGH
-*/
+/*GRect works like this - LEFT TOP WIDE HIGH*/
 #define TIME_FRAME      (GRect(0, 52, 144, 55))
-#define DATE_FRAME      (GRect(0, 108, 144, 20))
-
-
+#define DATE_FRAME      (GRect(0, 108, 144, 30))
+	
 Window window;          /* main window */
+BmpContainer background_image;
+
 TextLayer date_layer;   /* layer for the date */
 TimeLayer time_layer;   /* layer for the time */
-BmpContainer background_image;
 
 GFont font_date;        /* font for date */
 GFont font_hour;        /* font for hour */
-GFont font_minute;      /* font for minute */
+
+static int initial_minute;
 
 //Weather Stuff
 static int our_latitude, our_longitude;
@@ -152,53 +150,51 @@ void request_weather();
 
 /* Called by the OS once per minute. Update the time and date.
 */
-void handle_minute_tick(AppContextRef ctx, PebbleTickEvent *t)
-{
+void handle_minute_tick(AppContextRef ctx, PebbleTickEvent *t) {
     /* Need to be static because pointers to them are stored in the text
     * layers.
     */
-    static char date_text[] = "XXX 00";
+
     static char hour_text[] = "00";
     static char minute_text[] = ":00";
 
+    static char date_day[] = "XXX";
+    static char date_monthday[] = "00";
+    static char date_month[] = "XXX";
+    
+    static char full_date_text[20] = "";
+
     (void)ctx;  /* prevent "unused parameter" warning */
 
-    if (t->units_changed & DAY_UNIT)
-    {		
-	    string_format_time(date_text,
-                           sizeof(date_text),
-                           "%a %d",
+    if (t->units_changed & DAY_UNIT) {		
+
+	    string_format_time(date_day,
+                           sizeof(date_day),
+                           "%a",
                            t->tick_time);
-		
 
-		if (date_text[4] == '0') /* is day of month < 10? */
-		{
-		    /* This is a hack to get rid of the leading zero of the
-			   day of month
-            */
-            memmove(&date_text[4], &date_text[5], sizeof(date_text) - 1);
-		}
-        text_layer_set_text(&date_layer, date_text);
+	    string_format_time(date_monthday,
+                           sizeof(date_monthday),
+                           "%d",
+                           t->tick_time);
+
+	    string_format_time(date_month,
+                           sizeof(date_month),
+                           "%b",
+                           t->tick_time);
+
+      snprintf(full_date_text, sizeof(full_date_text), "%s %s %s", date_day, date_monthday, date_month); 
+      text_layer_set_text(&date_layer, full_date_text);
     }
 
-    if (clock_is_24h_style())
-    {
-        string_format_time(hour_text, sizeof(hour_text), "%H", t->tick_time);
-//		if (hour_text[0] == '0')
-//        {
-//            /* This is a hack to get rid of the leading zero of the hour.
-//            */
-//            memmove(&hour_text[0], &hour_text[1], sizeof(hour_text) - 1);
-//        }
+    if (clock_is_24h_style()) {
+      string_format_time(hour_text, sizeof(hour_text), "%H", t->tick_time);
+		  if (hour_text[0] == '0') {
+      }
     }
-    else
-    {
+    else {
         string_format_time(hour_text, sizeof(hour_text), "%I", t->tick_time);
-        if (hour_text[0] == '0')
-        {
-            /* This is a hack to get rid of the leading zero of the hour.
-            */
-            memmove(&hour_text[0], &hour_text[1], sizeof(hour_text) - 1);
+        if (hour_text[0] == '0') {
         }
     }
 
@@ -216,47 +212,43 @@ void handle_minute_tick(AppContextRef ctx, PebbleTickEvent *t)
 		link_monitor_ping();
 	}
 }
-
-
 /* Initialize the application.
 */
-void handle_init(AppContextRef ctx)
-{
-    PblTm tm;
-    PebbleTickEvent t;
-    ResHandle res_d;
-    ResHandle res_h;
+void handle_init(AppContextRef ctx) {
+  PblTm tm;
+  PebbleTickEvent t;
+  ResHandle res_d;
+  ResHandle res_h;
 
-    window_init(&window, "Warhol");
-    window_stack_push(&window, true /* Animated */);
-	resource_init_current_app(&APP_RESOURCES);
-	
-	bmp_init_container(RESOURCE_ID_IMAGE_BACKGROUND, &background_image);
-	layer_add_child(&window.layer, &background_image.layer.layer);
-	
-    
+  window_init(&window, "Warhol");
+  window_stack_push(&window, true /* Animated */);
+  resource_init_current_app(&APP_RESOURCES);
 
-    res_d = resource_get_handle(RESOURCE_ID_DATE_19);
-    res_h = resource_get_handle(RESOURCE_ID_TIME_50);
+  bmp_init_container(RESOURCE_ID_IMAGE_BACKGROUND, &background_image);
+  layer_add_child(&window.layer, &background_image.layer.layer);
+/* TIME AND DATE FONTS*/
+  res_d = resource_get_handle(RESOURCE_ID_DATE_23);
+  res_h = resource_get_handle(RESOURCE_ID_TIME_52);
 
-    font_date = fonts_load_custom_font(res_d);
-    font_hour = fonts_load_custom_font(res_h);
-    font_minute = fonts_load_custom_font(res_h);
+  font_date = fonts_load_custom_font(res_d);
+  font_hour = fonts_load_custom_font(res_h);
 
-    time_layer_init(&time_layer, window.layer.frame);
+  time_layer_init(&time_layer, window.layer.frame);
+  time_layer_set_text_color(&time_layer, GColorBlack);
     time_layer_set_text_color(&time_layer, GColorWhite);
     time_layer_set_background_color(&time_layer, GColorClear);
-    time_layer_set_fonts(&time_layer, font_hour, font_minute);
-    layer_set_frame(&time_layer.layer, TIME_FRAME);
-    layer_add_child(&window.layer, &time_layer.layer);
+  time_layer_set_fonts(&time_layer, font_hour, font_hour);
+  layer_set_frame(&time_layer.layer, TIME_FRAME);
+  layer_add_child(&window.layer, &time_layer.layer);
 
-    text_layer_init(&date_layer, window.layer.frame);
+  text_layer_init(&date_layer, window.layer.frame);
+  text_layer_set_text_color(&date_layer, GColorBlack);
     text_layer_set_text_color(&date_layer, GColorWhite);
     text_layer_set_background_color(&date_layer, GColorClear);
-    text_layer_set_font(&date_layer, font_date);
-    text_layer_set_text_alignment(&date_layer, GTextAlignmentCenter);
-    layer_set_frame(&date_layer.layer, DATE_FRAME);
-    layer_add_child(&window.layer, &date_layer.layer);
+  text_layer_set_font(&date_layer, font_date);
+  text_layer_set_text_alignment(&date_layer, GTextAlignmentCenter);
+  layer_set_frame(&date_layer.layer, DATE_FRAME);
+  layer_add_child(&window.layer, &date_layer.layer);
 
 	// Add weather layer
 	weather_layer_init(&weather_layer, GPoint(0, 90)); //0, 100
@@ -268,7 +260,6 @@ void handle_init(AppContextRef ctx)
 	get_time(&tm);
     t.tick_time = &tm;
     t.units_changed = SECOND_UNIT | MINUTE_UNIT | HOUR_UNIT | DAY_UNIT;
-	
 	handle_minute_tick(ctx, &t);
 }
 
@@ -278,9 +269,8 @@ void handle_deinit(AppContextRef ctx)
 {
     fonts_unload_custom_font(font_date);
     fonts_unload_custom_font(font_hour);
-    fonts_unload_custom_font(font_minute);
-	bmp_deinit_container(&background_image);
-	weather_layer_deinit(&weather_layer);
+    bmp_deinit_container(&background_image);
+	  weather_layer_deinit(&weather_layer);
 }
 
 
@@ -290,19 +280,18 @@ void pbl_main(void *params)
 {
     PebbleAppHandlers handlers =
     {
-        .init_handler = &handle_init,
-        .deinit_handler = &handle_deinit,
-        .tick_info =
-        {
+      .init_handler = &handle_init,
+      .deinit_handler = &handle_deinit,
+      .tick_info = {
             .tick_handler = &handle_minute_tick,
             .tick_units = MINUTE_UNIT
-        },
-		.messaging_info = {
-			.buffer_sizes = {
-				.inbound = 124,
-				.outbound = 256,
-			}
-		}
+      },
+		  .messaging_info = {
+			  .buffer_sizes = {
+				  .inbound = 124,
+				  .outbound = 256,
+			  }
+		  }
     };
 
     app_event_loop(params, &handlers);
@@ -315,7 +304,7 @@ void request_weather() {
 	}
 	// Build the HTTP request
 	DictionaryIterator *body;
-	HTTPResult result = http_out_get("http://EXAMPLE.com/YOUR_WEATHER.php", WEATHER_HTTP_COOKIE, &body);
+	HTTPResult result = http_out_get("http://YOUR_WEATHER_PHP_LOCATION.php", WEATHER_HTTP_COOKIE, &body);
 	if(result != HTTP_OK) {
 		weather_layer_set_icon(&weather_layer, WEATHER_ICON_HTTP_ERROR);
 		return;

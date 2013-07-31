@@ -10,17 +10,22 @@ function get_data($url) {
     curl_close($ch);
     return $data;
 }
+header("Content-Type: application/json");
+header("Expires: 0");
+header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
+header("Cache-Control: no-store, no-cache, must-revalidate");
+header("Cache-Control: post-check=0, pre-check=0", false);
+header("Pragma: no-cache");
 
-define('API_KEY', 'YOUR_API_KEY_HERE'); 
+define('API_KEY', '9a38b8aa55020089de9d971676bbd8e5'); 
 $payload = json_decode(file_get_contents('php://input'), true);
 if(!$payload) die();
 $payload[1] /= 10000;
 $payload[2] /= 10000;
 
-$contents = get_data("https://api.forecast.io/forecast/YOUR_API_KEY_HERE/$payload[1],$payload[2]?units=$payload[3]&exclude=hourly,minutely,alerts");
-
+$contents = get_data("https://api.forecast.io/forecast/9a38b8aa55020089de9d971676bbd8e5/$payload[1],$payload[2]?units=$payload[3]&exclude=hourly,minutely,alerts");
 $forecast = json_decode($contents);
- 
+
 if(!$forecast) {
     die();
 }      
@@ -63,5 +68,4 @@ $response[3] = array('s', round($forecast->daily->data[0]->temperatureMax));
 $response[4] = array('s', round($forecast->daily->data[0]->temperatureMin));
 $response[5] = array('s', intval($sunset_h));
 $response[6] = array('s', intval($round_m));
-header("Cache-Control: max-age=540");
 print json_encode($response);

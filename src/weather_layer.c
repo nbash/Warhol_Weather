@@ -31,7 +31,7 @@ void weather_layer_init(WeatherLayer* weather_layer, GPoint pos) {
 	layer_add_child(&weather_layer->layer, &weather_layer->temp_layer_background.layer);
 	
     // Add temperature layer
-	text_layer_init(&weather_layer->temp_layer, GRect(2, -5, 72, 95));
+	text_layer_init(&weather_layer->temp_layer, GRect(3, -5, 72, 95));
 	text_layer_set_background_color(&weather_layer->temp_layer, GColorClear);
 	text_layer_set_text_color(&weather_layer->lowvalue_layer, GColorWhite);
 	text_layer_set_text_alignment(&weather_layer->temp_layer, GTextAlignmentCenter);
@@ -43,7 +43,7 @@ void weather_layer_init(WeatherLayer* weather_layer, GPoint pos) {
 	text_layer_set_background_color(&weather_layer->highvalue_layer, GColorClear);
 	text_layer_set_text_color(&weather_layer->highvalue_layer, GColorWhite);
 	text_layer_set_text_alignment(&weather_layer->highvalue_layer, GTextAlignmentLeft);
-	text_layer_set_font(&weather_layer->highvalue_layer, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_HIGH_LOW_17)));
+	text_layer_set_font(&weather_layer->highvalue_layer, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_HIGH_LOW_18)));
 	layer_add_child(&weather_layer->layer, &weather_layer->highvalue_layer.layer);
 	
 	//ADD LOW LABEL VALUE LAYER
@@ -51,32 +51,32 @@ void weather_layer_init(WeatherLayer* weather_layer, GPoint pos) {
 	text_layer_set_background_color(&weather_layer->lowvalue_layer, GColorClear);
 	text_layer_set_text_color(&weather_layer->lowvalue_layer, GColorWhite);
 	text_layer_set_text_alignment(&weather_layer->lowvalue_layer, GTextAlignmentLeft);
-	text_layer_set_font(&weather_layer->lowvalue_layer, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_HIGH_LOW_17)));
+	text_layer_set_font(&weather_layer->lowvalue_layer, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_HIGH_LOW_18)));
 	layer_add_child(&weather_layer->layer, &weather_layer->lowvalue_layer.layer);	
 
 	
 //SUNSET
-	text_layer_init(&weather_layer->sslabel_layer, GRect(5, 142, 78, 18));
+	text_layer_init(&weather_layer->sslabel_layer, GRect(3, 139, 78, 24));
 	text_layer_set_background_color(&weather_layer->sslabel_layer, GColorClear);
 	text_layer_set_text_color(&weather_layer->sslabel_layer, GColorBlack);
 	text_layer_set_text_alignment(&weather_layer->sslabel_layer, GTextAlignmentRight);
-	text_layer_set_font(&weather_layer->sslabel_layer, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_SUNSET_18)));
+	text_layer_set_font(&weather_layer->sslabel_layer, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_SUNSET_22)));
 	layer_add_child(&weather_layer->layer, &weather_layer->sslabel_layer.layer);
 	
 //shvalue_layer	
-	text_layer_init(&weather_layer->shvalue_layer, GRect(83, 142, 40, 18));
+	text_layer_init(&weather_layer->shvalue_layer, GRect(80, 139, 40, 24));
 	text_layer_set_background_color(&weather_layer->shvalue_layer, GColorClear);
 	text_layer_set_text_color(&weather_layer->shvalue_layer, GColorBlack);
 	text_layer_set_text_alignment(&weather_layer->shvalue_layer, GTextAlignmentLeft);
-	text_layer_set_font(&weather_layer->shvalue_layer, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_SUNSET_18)));
+	text_layer_set_font(&weather_layer->shvalue_layer, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_SUNSET_22)));
 	layer_add_child(&weather_layer->layer, &weather_layer->shvalue_layer.layer);
 	
 //smvalue_layer	
-	text_layer_init(&weather_layer->smvalue_layer, GRect(108, 142, 60, 18));
+	text_layer_init(&weather_layer->smvalue_layer, GRect(105, 139, 60, 24));
 	text_layer_set_background_color(&weather_layer->smvalue_layer, GColorClear);
 	text_layer_set_text_color(&weather_layer->smvalue_layer, GColorBlack);
 	text_layer_set_text_alignment(&weather_layer->smvalue_layer, GTextAlignmentLeft);
-	text_layer_set_font(&weather_layer->smvalue_layer, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_SUNSET_18)));
+	text_layer_set_font(&weather_layer->smvalue_layer, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_SUNSET_22)));
 	layer_add_child(&weather_layer->layer, &weather_layer->smvalue_layer.layer);
 	
 	
@@ -123,7 +123,7 @@ void weather_layer_set_sm(WeatherLayer* weather_layer, int16_t sm) {
 void weather_layer_set_high(WeatherLayer* weather_layer, int16_t h) {
 	memcpy(weather_layer->high_str, itoa(h), 4);
 	int degree_pos = strlen(weather_layer->high_str);
-	memcpy(&weather_layer->high_str[degree_pos], "°", 3);
+	memcpy(&weather_layer->high_str[degree_pos], " ", 3);
 	text_layer_set_text(&weather_layer->highvalue_layer, weather_layer->high_str);
 	/*
 	memcpy(&weather_layer->highlbl_str[0], "HIGH :", 6);
@@ -133,7 +133,7 @@ void weather_layer_set_high(WeatherLayer* weather_layer, int16_t h) {
 void weather_layer_set_low(WeatherLayer* weather_layer, int16_t l) {
 	memcpy(weather_layer->low_str, itoa(l), 4);
 	int degree_poss = strlen(weather_layer->low_str);
-	memcpy(&weather_layer->low_str[degree_poss], "°", 3);
+	memcpy(&weather_layer->low_str[degree_poss], " ", 3);
 	text_layer_set_text(&weather_layer->lowvalue_layer, weather_layer->low_str);
 	/*
 	memcpy(&weather_layer->lowlbl_str[0], "LOW :", 5);

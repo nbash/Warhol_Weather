@@ -16,38 +16,6 @@
             "file": "images/background.png"
         },
         {
-            "characterRegex": "[0-9 : Sunset]",
-            "defName": "SUNSET_18",
-            "type": "font",
-            "file": "fonts/Trebuchet MS.ttf"
-        },
-        {
-            "characterRegex": "[0-9 :]",
-            "defName": "TIME_50",
-            "type": "font",
-            "file": "fonts/Trebuchet MS.ttf"
-        },
-        {
-            "trackingAdjust": -1,
-            "characterRegex": "[0-9 \u00b0 ?]",
-            "defName": "HIGH_LOW_17",
-            "type": "font",
-            "file": "fonts/Trebuchet MS.ttf"
-        },
-        {
-            "trackingAdjust": -1,
-            "characterRegex": "[0-9 \u00b0 ?]",
-            "defName": "TEMP_42",
-            "type": "font",
-            "file": "fonts/Trebuchet MS.ttf"
-        },
-        {
-            "characterRegex": "[0-9 a-z A-Z]",
-            "defName": "DATE_19",
-            "type": "font",
-            "file": "fonts/Trebuchet MS.ttf"
-        },
-        {
             "defName": "ICON_ERROR",
             "type": "png",
             "file": "images/error.png"
@@ -101,6 +69,42 @@
             "defName": "ICON_PARTLY_CLOUDY_NIGHT",
             "type": "png",
             "file": "images/partly-cloudy-night.png"
+        },
+        {
+            "characterRegex": "[0-9 :]",
+            "defName": "TIME_52",
+            "type": "font",
+            "file": "fonts/MuroRegular.ttf"
+        },
+        {
+            "characterRegex": "[0-9 \u00b0]",
+            "defName": "TEMP_42",
+            "type": "font",
+            "file": "fonts/MuroRegular.ttf"
+        },
+        {
+            "characterRegex": "[0-9 A-z]",
+            "defName": "DATE_23",
+            "type": "font",
+            "file": "fonts/BebasNeue.ttf"
+        },
+        {
+            "trackingAdjust": 1,
+            "characterRegex": "[0-9 : ]",
+            "defName": "HIGH_LOW_18",
+            "type": "font",
+            "file": "fonts/BebasNeue.ttf"
+        },
+        {
+            "characterRegex": "[0-9 : Sunset]",
+            "defName": "SUNSET_22",
+            "type": "font",
+            "file": "fonts/BebasNeue.ttf"
+        },
+        {
+            "defName": "IMAGE_BACKGROUND_SPLIT",
+            "type": "png",
+            "file": "images/background-split.png"
         }
     ],
     "friendlyVersion": "VERSION",
