@@ -17,13 +17,13 @@ header("Cache-Control: no-store, no-cache, must-revalidate");
 header("Cache-Control: post-check=0, pre-check=0", false);
 header("Pragma: no-cache");
 
-define('API_KEY', '9a38b8aa55020089de9d971676bbd8e5'); 
+define('API_KEY', 'YOUR_API_KEY_HERE'); 
 $payload = json_decode(file_get_contents('php://input'), true);
 if(!$payload) die();
 $payload[1] /= 10000;
 $payload[2] /= 10000;
 
-$contents = get_data("https://api.forecast.io/forecast/9a38b8aa55020089de9d971676bbd8e5/$payload[1],$payload[2]?units=$payload[3]&exclude=hourly,minutely,alerts");
+$contents = get_data("https://api.forecast.io/forecast/YOUR_API_KEY_HERE/$payload[1],$payload[2]?units=$payload[3]&exclude=hourly,minutely,alerts");
 $forecast = json_decode($contents);
 
 if(!$forecast) {
