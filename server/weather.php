@@ -48,6 +48,7 @@ while ($round_m < 10)
   if ($round_m < 5)
   {
     $round_m = 59;
+    $sunset_h = $sunset_h -1;
   }
   elseif ($round_m >=5)
   {
