@@ -12,8 +12,8 @@
 #define MY_UUID { 0x91, 0x41, 0xB6, 0x28, 0xBC, 0x89, 0x49, 0x8E, 0xB1, 0x47, 0x04, 0x9F, 0x49, 0xC0, 0x99, 0xAD }
 
 PBL_APP_INFO(MY_UUID,
-             "Warhol Weather", "NBASH", // Modification of "Roboto Weather" by Martin Rosinski
-             1, 05, /* App version */
+             "Warhol Weather", "Roost", // Modification of "Roboto Weather" by Martin Rosinski
+             1, 06, /* App version */
              RESOURCE_ID_IMAGE_MENU_ICON,
              APP_INFO_WATCH_FACE);
 
@@ -33,7 +33,9 @@ PBL_APP_INFO(MY_UUID,
 	
 //Cookie variables
 #define WEATHER_HTTP_COOKIE 1949327671
-#define TIME_HTTP_COOKIE 1131038282
+	
+//#define TIME_HTTP_COOKIE 1131038282
+	
 /*GRect works like this - LEFT TOP WIDE HIGH*/
 #define TIME_FRAME      (GRect(0, 52, 144, 55))
 #define DATE_FRAME      (GRect(0, 108, 144, 30))
@@ -47,7 +49,7 @@ TimeLayer time_layer;   /* layer for the time */
 GFont font_date;        /* font for date */
 GFont font_hour;        /* font for hour */
 
-static int initial_minute;
+
 
 //Weather Stuff
 static int our_latitude, our_longitude;
@@ -56,6 +58,7 @@ static bool located = false;
 WeatherLayer weather_layer;
 
 void request_weather();
+void handle_timer(AppContextRef app_ctx, AppTimerHandle handle, uint32_t cookie);
 
 /*FAILED REQUEST OF WEATHER EITHER NO CONNECTION OR HTTP ERROR
 ***************************************************************/
@@ -63,6 +66,7 @@ void failed(int32_t cookie, int http_status, void* context) {
 	if(cookie == 0 || cookie == WEATHER_HTTP_COOKIE) {		
 //		weather_layer_set_icon(&weather_layer, WEATHER_ICON_NO_WEATHER);
 //		text_layer_set_text(&weather_layer.temp_layer, "---°   ");
+		layer_mark_dirty(&weather_layer.layer);
 	}
 	
 	link_monitor_handle_failure(http_status);
@@ -93,7 +97,11 @@ GET THE TEMPERATURE
 ***************************/	
 	Tuple* temperature_tuple = dict_find(received, WEATHER_KEY_TEMPERATURE);
 	if(temperature_tuple) {
+		
+		text_layer_set_text(&weather_layer.temp_layer, "0");
+		weather_layer_set_temperature(&weather_layer, 1);
 		weather_layer_set_temperature(&weather_layer, temperature_tuple->value->int16);
+		
 	}
 /*
 GET THE HIGH TEMP
@@ -128,7 +136,9 @@ GET THE SUNSET MINUTE
 	link_monitor_handle_success();
 }
 
-
+void set_timer(AppContextRef ctx) {
+	app_timer_send_event(ctx, 1740000, 1);
+}
 
 /*GET OUR LOCATION AND * BY 10000 TO GET RID OF THE DECIMAL
 *************************************************************************/
@@ -142,7 +152,6 @@ void location(float latitude, float longitude, float altitude, float accuracy, v
 /*RECONNECT IF CONNECTION LOST
 ************************************/
 void reconnect(void* context) {
-	located = false;
 	request_weather();
 }
 
@@ -219,8 +228,10 @@ void handle_init(AppContextRef ctx) {
   PebbleTickEvent t;
   ResHandle res_d;
   ResHandle res_h;
+  located=false;
+  request_weather();
 
-  window_init(&window, "Warhol");
+  window_init(&window, "Node");
   window_stack_push(&window, true /* Animated */);
   resource_init_current_app(&APP_RESOURCES);
 
@@ -233,6 +244,8 @@ void handle_init(AppContextRef ctx) {
   font_date = fonts_load_custom_font(res_d);
   font_hour = fonts_load_custom_font(res_h);
 
+	
+	layer_mark_dirty(&weather_layer.layer);
   time_layer_init(&time_layer, window.layer.frame);
   time_layer_set_text_color(&time_layer, GColorBlack);
     time_layer_set_text_color(&time_layer, GColorWhite);
@@ -254,7 +267,16 @@ void handle_init(AppContextRef ctx) {
 	weather_layer_init(&weather_layer, GPoint(0, 90)); //0, 100
 	layer_add_child(&window.layer, &weather_layer.layer);
 	
-	http_register_callbacks((HTTPCallbacks){.failure=failed,.success=success,.reconnect=reconnect,.location=location}, (void*)ctx);
+	http_register_callbacks((HTTPCallbacks){
+		.failure=failed,
+		.success=success,
+		.reconnect=reconnect,
+		.location=location
+	}, (void*)ctx);
+
+	// Request weather
+	located = false;
+	request_weather();
 	
 	// Refresh time
 	get_time(&tm);
@@ -286,15 +308,23 @@ void pbl_main(void *params)
             .tick_handler = &handle_minute_tick,
             .tick_units = MINUTE_UNIT
       },
-		  .messaging_info = {
-			  .buffer_sizes = {
-				  .inbound = 124,
-				  .outbound = 256,
-			  }
-		  }
+.timer_handler = handle_timer,
+		.messaging_info = {
+			.buffer_sizes = {
+				.inbound = 124,
+				.outbound = 256,
+			}
+		}
     };
 
     app_event_loop(params, &handlers);
+}
+
+void handle_timer(AppContextRef ctx, AppTimerHandle handle, uint32_t cookie) {
+	request_weather();
+	// Update again in fifteen minutes.
+	if(cookie)
+		set_timer(ctx);
 }
 
 void request_weather() {
@@ -304,7 +334,7 @@ void request_weather() {
 	}
 	// Build the HTTP request
 	DictionaryIterator *body;
-	HTTPResult result = http_out_get("http://YOUR_WEATHER_PHP_LOCATION.php", WEATHER_HTTP_COOKIE, &body);
+	HTTPResult result = http_out_get("http://weather.php", WEATHER_HTTP_COOKIE, &body);
 	if(result != HTTP_OK) {
 		weather_layer_set_icon(&weather_layer, WEATHER_ICON_HTTP_ERROR);
 		return;

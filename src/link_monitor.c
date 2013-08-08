@@ -27,17 +27,20 @@ void link_monitor_handle_failure(int error)
 	{
 		case 1008: //Watchapp not running
 			//Considered a link failure
+		    layer_mark_dirty(&weather_layer.layer);
 			weather_layer_set_icon(&weather_layer, WEATHER_ICON_NO_WEATHER);
 		
 			break;
 		
 		case 1064: //APP_MSG_BUSY
 			//These are more likely to specify a temporary error than a lost watch
+		    layer_mark_dirty(&weather_layer.layer);
 			weather_layer_set_icon(&weather_layer, WEATHER_ICON_NO_WEATHER);
 			return;
 		
 		case HTTP_INVALID_BRIDGE_RESPONSE + 1000:
 			//The phone may have no internet connection, but the link should be fine
+		    layer_mark_dirty(&weather_layer.layer);
 			weather_layer_set_icon(&weather_layer, WEATHER_ICON_HTTP_ERROR);
 			return;
 	

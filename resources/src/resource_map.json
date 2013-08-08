@@ -100,11 +100,6 @@
             "defName": "SUNSET_22",
             "type": "font",
             "file": "fonts/BebasNeue.ttf"
-        },
-        {
-            "defName": "IMAGE_BACKGROUND_SPLIT",
-            "type": "png",
-            "file": "images/background-split.png"
         }
     ],
     "friendlyVersion": "VERSION",

@@ -109,6 +109,7 @@ void weather_layer_set_sh(WeatherLayer* weather_layer, int16_t ss) {
 	
 	memcpy(&weather_layer->sslbl_str[0], "Sunset:  ", 8);
 	text_layer_set_text(&weather_layer->sslabel_layer, weather_layer->sslbl_str);
+	layer_mark_dirty(&weather_layer->layer);
 }
 
 void weather_layer_set_sm(WeatherLayer* weather_layer, int16_t sm) {
@@ -116,6 +117,7 @@ void weather_layer_set_sm(WeatherLayer* weather_layer, int16_t sm) {
 	int sm_pos = strlen(weather_layer->sm_str);
 	memcpy(&weather_layer->sm_str[sm_pos], " ", 3);
 	text_layer_set_text(&weather_layer->smvalue_layer, weather_layer->sm_str);
+	layer_mark_dirty(&weather_layer->layer);
 	
 }
 
@@ -125,6 +127,7 @@ void weather_layer_set_high(WeatherLayer* weather_layer, int16_t h) {
 	int degree_pos = strlen(weather_layer->high_str);
 	memcpy(&weather_layer->high_str[degree_pos], " ", 3);
 	text_layer_set_text(&weather_layer->highvalue_layer, weather_layer->high_str);
+	layer_mark_dirty(&weather_layer->layer);
 	/*
 	memcpy(&weather_layer->highlbl_str[0], "HIGH :", 6);
 	text_layer_set_text(&weather_layer->highlabel_layer, weather_layer->highlbl_str);*/
@@ -135,6 +138,7 @@ void weather_layer_set_low(WeatherLayer* weather_layer, int16_t l) {
 	int degree_poss = strlen(weather_layer->low_str);
 	memcpy(&weather_layer->low_str[degree_poss], " ", 3);
 	text_layer_set_text(&weather_layer->lowvalue_layer, weather_layer->low_str);
+	layer_mark_dirty(&weather_layer->layer);
 	/*
 	memcpy(&weather_layer->lowlbl_str[0], "LOW :", 5);
 	text_layer_set_text(&weather_layer->lowlabel_layer, weather_layer->lowlbl_str);*/
@@ -162,8 +166,8 @@ void weather_layer_set_temperature(WeatherLayer* weather_layer, int16_t t) {
 	  text_layer_set_text_alignment(&weather_layer->temp_layer, GTextAlignmentCenter);
 	  memcpy(&weather_layer->temp_str[degree_pos], " ", 3);
 	}
-	
 	text_layer_set_text(&weather_layer->temp_layer, weather_layer->temp_str);
+	layer_mark_dirty(&weather_layer->layer);
 }
 
 
