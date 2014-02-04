@@ -1,14 +1,16 @@
+Warhol_Weather
+==============
 Please read this, it will help answer all your questions.
 
 
 So, inorder for this to work you need a couple of things:
 
-1.) A Pebble Watch
-2.) A Smart Phone (Android or Apple)
-3.) A webserver you can toss php files
-3a.) If you don't have a webserver maybe a friend does or you could ask someone nicely to use their weather file
-4.) A Free account from Forecast IO
-4a.) To Create your free account just head to https://developer.forecast.io/ and click register...then COPY YOUR API KEY LISTED THERE.
+1. A Pebble Watch
+2. A Smart Phone (Android or Apple)
+3. A webserver you can toss php files
+    * If you don't have a webserver maybe a friend does or you could ask someone nicely to use their weather file
+4. A Free account from Forecast IO
+    * To Create your free account just head to https://developer.forecast.io/ and click register...then COPY YOUR API KEY LISTED THERE.
 
 
 Now head over to:
